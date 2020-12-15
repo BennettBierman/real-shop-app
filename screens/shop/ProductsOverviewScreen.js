@@ -65,7 +65,6 @@ const ProductsOverviewScreen = props => {
                 <Button title='Try Again' onPress={loadProducts} color={Colors.primary}/>
             </View>
         );
-
     }
 
     if (isLoading) { 
@@ -127,7 +126,6 @@ ProductsOverviewScreen.navigationOptions = navigationData => {
                         navigationData.navigation.toggleDrawer();
                     }}
                 />
-
             </HeaderButtons>
         ),
         headerRight: (

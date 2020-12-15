@@ -4,8 +4,8 @@ import Product from '../../models/product';
 import { CREATE_PRODUCT, DELETE_PRODUCT, SET_PRODUCTS, UPDATE_PRODUCT } from '../actions/products';
 
 const initialState = {
-    availableProducts: PRODUCTS,
-    userProducts: PRODUCTS.filter(product => product.ownerId === 'u1')
+    availableProducts: [],
+    userProducts: []
 };
 
 export default (state = initialState, action) => {
@@ -13,7 +13,7 @@ export default (state = initialState, action) => {
         case CREATE_PRODUCT:
             const newProduct = new Product(
                 action.productData.id, //this was created with the server
-                'u1', //this is still a dummy user id
+                action.productData.ownerId,
                 action.productData.title,
                 action.productData.imageUrl,
                 action.productData.description,
@@ -49,17 +49,17 @@ export default (state = initialState, action) => {
                 userProducts: updatedUserProducts
             };
 
-
         case DELETE_PRODUCT:
             return {
                 ...state,
                 userProducts: state.userProducts.filter(product => product.id !== action.pid),
                 availableProducts: state.availableProducts.filter(product => product.id !== action.pid)
             }
+        
         case SET_PRODUCTS:
             return {
                 availableProducts: action.products,
-                userProducts: action.products.filter(product => product.ownerId === 'u1')
+                userProducts: action.userProducts
             }
     }
     return state;

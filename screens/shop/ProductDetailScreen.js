@@ -37,7 +37,6 @@ ProductDetailScreen.navigationOptions = navigationData => {
     return {
         headerTitle: navigationData.navigation.getParam('productTitle')
     };
-    
 }
 
 const styles = StyleSheet.create({

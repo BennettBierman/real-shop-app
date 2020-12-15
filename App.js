@@ -8,13 +8,16 @@ import ReduxThunk from 'redux-thunk';
 import productReducer from './store/reducers/products';
 import cartReducer from './store/reducers/cart';
 import orderReducer from './store/reducers/orders';
+import authReducer from './store/reducers/auth';
 import ShopNavigator from './navigation/ShopNavigator';
+
 
 //Combining all redux reducers
 const rootReducer = combineReducers({
   products: productReducer,
   cart: cartReducer,
-  orders: orderReducer
+  orders: orderReducer,
+  auth: authReducer
 });
 
 //Creating store with reducers to send to provider wrapper
@@ -25,7 +28,6 @@ const fetchFonts = () => {
     'open-sans': require('./assets/fonts/OpenSans-Regular.ttf'),
     'open-sans-bold': require('./assets/fonts/OpenSans-Bold.ttf')
   });
-
 };
 
 export default function App() {

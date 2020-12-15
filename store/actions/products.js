@@ -6,8 +6,9 @@ export const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
 export const SET_PRODUCTS = 'SET_PRODUCTS'; //this is essentially fetch products via database
 
 export const deleteProduct = productId => { 
-    return async dispatch => {
-        const response = await fetch(`https://real-shop-app-a3353-default-rtdb.firebaseio.com/products/${productId}.json`, {
+    return async (dispatch, getState) => {
+        const token = getState().auth.token;
+        const response = await fetch(`https://real-shop-app-a3353-default-rtdb.firebaseio.com/products/${productId}.json?auth=${token}`, {
             method: 'DELETE'
         });
 
@@ -22,23 +23,28 @@ export const deleteProduct = productId => {
 //This syntax does everything the OG syntax did but now also dispatches to the server
 export const createProduct = (title, description, imageUrl, price) => { 
     //this was updated with ReduxThunk ... before just returned an action JS object
-    return async dispatch => { 
+    return async (dispatch, getState) => { 
         //can put any aysnc code we want right here!
         //Fetch is a built-in api that can send and recieve data from a database
         //can add /"anything".json to end of link to add a new folder in the database
         //this is a POST request and fetch always returns a promise object so you can use
         // then and cathc on it or the new async await way too
-        const response = await fetch('https://real-shop-app-a3353-default-rtdb.firebaseio.com/products.json', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                title: title,
-                description: description,
-                imageUrl: imageUrl,
-                price: price
-            })
+        const token = getState().auth.token;
+        const userId = getState().auth.userId;
+        const response = await fetch(
+            `https://real-shop-app-a3353-default-rtdb.firebaseio.com/products.json?auth=${token}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: title,
+                    description: description,
+                    imageUrl: imageUrl,
+                    price: price,
+                    ownerId: userId
+                })
         });
 
         //this is the data firebase sends to use when we post the response above 
@@ -53,26 +59,28 @@ export const createProduct = (title, description, imageUrl, price) => {
                 title: title,
                 description: description,
                 imageUrl: imageUrl,
-                price: price
+                price: price,
+                ownerId: userId
             }
         });
     };
 };
 
 export const updateProduct = (id, title, description, imageUrl) => { 
-    return async dispatch => { 
-
-        //Dont need to save as const response because response.name is not needed anywhere
-        const response = await fetch(`https://real-shop-app-a3353-default-rtdb.firebaseio.com/products/${id}.json`, {
-            method: 'PATCH', //Patch changes values of the values in the body below
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                title: title,
-                description: description,
-                imageUrl: imageUrl
-            })
+    return async (dispatch, getState) => { 
+        const token = getState().auth.token;
+        const response = await fetch(
+            `https://real-shop-app-a3353-default-rtdb.firebaseio.com/products/${id}.json?auth=${token}`,
+            {
+                method: 'PATCH', //Patch changes values of the values in the body below
+                headers: { 
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: title,
+                    description: description,
+                    imageUrl: imageUrl
+                })
         });
 
         //400 or 500 status code
@@ -93,7 +101,8 @@ export const updateProduct = (id, title, description, imageUrl) => {
 };
 
 export const fetchProducts = () => { 
-    return async dispatch => { 
+    return async (dispatch, getState) => { 
+        const userId = getState().auth.userId;
         try {
             //dont have arguments after link because method is GET which is the default
             const response = await fetch('https://real-shop-app-a3353-default-rtdb.firebaseio.com/products.json');
@@ -109,14 +118,18 @@ export const fetchProducts = () => {
             for (const key in responseData) {
                 loadedProducts.push(new Product(
                     key,
-                    'u1',
+                    responseData[key].ownerId,
                     responseData[key].title,
                     responseData[key].imageUrl,
                     responseData[key].description,
                     responseData[key].price
                 ))
             }
-            dispatch({ type: SET_PRODUCTS, products: loadedProducts });
+            dispatch({
+                type: SET_PRODUCTS,
+                products: loadedProducts,
+                userProducts: loadedProducts.filter(prod => prod.ownerId === userId)
+            });
         } catch (error) { 
             //could send to custom analytics server
             throw error;
