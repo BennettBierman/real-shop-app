@@ -6,7 +6,6 @@ class Order {
         this.items = items;
         this.totalAmount = totalAmount;
         this.date = date;
-
     }
 
     get readableDate() { 

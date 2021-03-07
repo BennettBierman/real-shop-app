@@ -51,7 +51,7 @@ const AuthScreen = props => {
             password: false
         },
         formIsValid: false
-    })
+    });
 
     useEffect(() => {
         if (error) { 
