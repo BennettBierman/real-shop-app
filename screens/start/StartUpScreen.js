@@ -27,8 +27,10 @@ const StartUpScreen = props => {
                 props.navigation.navigate('Auth');
                 return;
             }
+            const expirationTime = expirationDate.getTime() - new Date().getTime();
+
             //if here we must have a valid token so we should go to the shop
-            dispatch(authActions.authenticate(userId, token));
+            dispatch(authActions.authenticate(userId, token, expirationTime));
             props.navigation.navigate('Shop');
 
         };

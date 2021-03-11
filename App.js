@@ -9,7 +9,7 @@ import productReducer from './store/reducers/products';
 import cartReducer from './store/reducers/cart';
 import orderReducer from './store/reducers/orders';
 import authReducer from './store/reducers/auth';
-import ShopNavigator from './navigation/ShopNavigator';
+import AppNavigator from './navigation/AppNavigator';
 
 
 //Combining all redux reducers
@@ -44,7 +44,7 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <ShopNavigator/>
+      <AppNavigator/>
     </Provider>
   );
 }

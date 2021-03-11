@@ -5,8 +5,12 @@ export const LOGOUT = 'LOGOUT';
 
 let timer;
 
-export const authenticate = (userId, token) => { 
-    return { type: AUTHENTICATE, userId: userId, token: token };
+export const authenticate = (userId, token, expiryTime) => { 
+    return dispatch => { 
+        dispatch(setLogoutTimer(expiryTime));
+        dispatch({ type: AUTHENTICATE, userId: userId, token: token });
+    }
+   
 };
 
 export const signup = (email, password) => {
@@ -38,7 +42,7 @@ export const signup = (email, password) => {
 
         const responseData = await response.json();
         console.log(responseData);
-        dispatch(authenticate(responseData.localId, responseData.idToken));
+        dispatch(authenticate(responseData.localId, responseData.idToken, parseInt(responseData.expiresIn) * 1000));
         console.log(`localId: ${responseData.localId}`);
         console.log(`idToek: ${responseData.idToken}`);
         const expirationDate = new Date(new Date().getTime() + parseInt(responseData.expiresIn) * 1000);
@@ -78,7 +82,7 @@ export const login = (email, password) => {
 
         const responseData = await response.json();
         console.log(responseData);
-        dispatch(authenticate(responseData.localId, responseData.idToken));
+        dispatch(authenticate(responseData.localId, responseData.idToken, parseInt(responseData.expiresIn) * 1000));
         const expirationDate = new Date(new Date().getTime() + parseInt(responseData.expiresIn) * 1000);
         saveDataToStorage(responseData.idToken, responseData.localId, expirationDate); //saved for autologin 
     };
@@ -86,13 +90,13 @@ export const login = (email, password) => {
 
 export const logout = () => {
     clearLogoutTimer();
-    AsyncStorage.removeItem('userData');
+    AsyncStorage.removeItem('userData'); 
     return { type: LOGOUT };
 };
 
 const clearLogoutTimer = () => { 
     if (timer) { 
-        clearTimeout(timer); 
+        clearTimeout(timer); //built into JS function
     }
 };
 
